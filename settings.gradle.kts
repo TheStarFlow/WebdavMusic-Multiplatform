@@ -1,3 +1,5 @@
+import java.net.URI
+
 rootProject.name = "WebdavMusic-Multiplatform"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -12,6 +14,9 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            url  = uri("https://jitpack.io")
+        }
     }
 }
 
@@ -22,9 +27,13 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("androidx")
                 includeGroupAndSubgroups("com.android")
                 includeGroupAndSubgroups("com.google")
+
             }
         }
         mavenCentral()
+        maven {
+            url  = uri("https://jitpack.io")
+        }
     }
 }
 

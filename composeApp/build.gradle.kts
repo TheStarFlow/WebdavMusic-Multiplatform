@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -25,6 +27,9 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
+            implementation(libs.room.runtime.android)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -33,6 +38,24 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation(libs.sqlite.driver)
+            implementation(libs.room.gradle.plugin)
+            implementation(libs.room.runtime)
+           // implementation(libs.room.compiler)
+            implementation(libs.sqlite.driver)
+            implementation(libs.datastore)
+            implementation(libs.datastore.prefs)
+            implementation(libs.sardine)
+            implementation(libs.fastjson)
+            implementation(libs.koin.compose)
+            implementation(libs.jb.navigation.compose)
+//            implementation(libs.lifecycle.viewmodel)
+//            implementation(libs.lifecycle.viewmodel.compose)
+//            implementation(libs.lifecycle.runtime.compose)
+            implementation(libs.jb.lifecycle.viewmodel.compose)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -87,4 +110,12 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    ksp(libs.room.compiler)
 }
