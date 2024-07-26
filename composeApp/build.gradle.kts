@@ -29,6 +29,9 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.room.runtime.android)
+            implementation(libs.androidx.media3)
+            implementation(libs.androidx.media3.session)
+            implementation(libs.media3.flac.supprot)
 
         }
         commonMain.dependencies {
@@ -55,10 +58,13 @@ kotlin {
 //            implementation(libs.lifecycle.viewmodel.compose)
 //            implementation(libs.lifecycle.runtime.compose)
             implementation(libs.jb.lifecycle.viewmodel.compose)
+            implementation(libs.toast.compose)
+            implementation(libs.constraintlayout.compose)
 
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.vlcj)
         }
     }
 }
@@ -100,6 +106,12 @@ android {
     }
 }
 
+compose.resources{
+    publicResClass = true
+    packageOfResClass = "me.webdav.resources"
+    generateResClass = always
+}
+
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -117,5 +129,6 @@ room {
 }
 
 dependencies {
+    implementation(libs.androidx.media3.datasource)
     ksp(libs.room.compiler)
 }

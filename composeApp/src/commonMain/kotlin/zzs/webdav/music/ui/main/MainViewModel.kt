@@ -1,8 +1,10 @@
 package zzs.webdav.music.ui.main
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import zzs.webdav.music.base.BaseViewModel
+import zzs.webdav.music.base.Fail
 import zzs.webdav.music.base.Loading
 import zzs.webdav.music.base.Success
 import zzs.webdav.music.bean.ServerDesc
@@ -17,20 +19,17 @@ class MainViewModel(private val repository: WebdavRepository) :
         sendUiIntent(MainIntent.FetchServer)
     }
 
-    override fun initUiState(): MainState {
-        return MainState()
-    }
-
     override suspend fun handleIntent(intent: MainIntent) {
         when (intent) {
             is MainIntent.FetchServer -> {
                 suspend {
                     repository.fetchCacheServer()
                 }.execute(Dispatchers.IO) {
-                    logInfo(it.toString())
                     if (it is Success) {
                         copy(currServer = it)
-                    } else {
+                    } else if (it is Fail) {
+                        throw it.error
+                    }else{
                         this
                     }
                 }
@@ -45,7 +44,7 @@ class MainViewModel(private val repository: WebdavRepository) :
     fun modifyServer(
         serverDesc: ServerDesc,
         insert: Boolean,
-        updateCurr: Boolean,
+        updateCurr: Boolean = false,
         oriServer: ServerDesc? = null
     ) {
         if (updateCurr) {
@@ -84,5 +83,23 @@ class MainViewModel(private val repository: WebdavRepository) :
 
             }
         }
+    }
+
+    fun fetchCacheServerList() = flow<List<ServerDesc>> {
+        emit(repository.fetchCacheServerList())
+    }
+
+    fun setCurrServer(item: ServerDesc) {
+        viewModelScope.launch {
+            repository.setCurrServerKey(item)
+        }
+        setState {
+            copy(currServer = Success(item))
+        }
+    }
+
+    fun deleteServer(item: ServerDesc) {
+        suspend { repository.deleteServer(item) }
+            .execute(Dispatchers.IO) { this }
     }
 }

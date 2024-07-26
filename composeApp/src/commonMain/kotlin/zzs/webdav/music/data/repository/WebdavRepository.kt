@@ -13,7 +13,7 @@ interface WebdavRepository {
      * 获取当前页面的 webdav 资源列表
      *
      * */
-    suspend fun fetchDavResList(serverDesc: ServerDesc): List<DavResource>
+    suspend fun fetchDavResList(serverDesc: ServerDesc, targetPath: String?): List<DavResource>
 
     /**
      * 获取当前正在使用的服务器

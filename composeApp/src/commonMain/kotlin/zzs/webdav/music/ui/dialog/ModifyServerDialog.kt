@@ -1,4 +1,4 @@
-package zzs.webdav.music.ui.modifyserver
+package zzs.webdav.music.ui.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,12 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -51,7 +48,11 @@ typealias ModifyServer = (ServerDesc, Boolean) -> Unit
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ModifyServerDialog(modifyServer: ModifyServer, currServer: ServerDesc? = null,dismiss:()->Unit = {}) {
+fun ModifyServerDialog(
+    modifyServer: ModifyServer,
+    currServer: ServerDesc? = null,
+    dismiss: () -> Unit = {}
+) {
     Dialog(
         onDismissRequest = {
 
@@ -62,21 +63,14 @@ fun ModifyServerDialog(modifyServer: ModifyServer, currServer: ServerDesc? = nul
         val port = remember { mutableStateOf(currServer?.port ?: "") }
         val user = remember { mutableStateOf(currServer?.user ?: "") }
         val password = remember { mutableStateOf(currServer?.password ?: "") }
-        val targetPath = remember { mutableStateOf(currServer?.targetPath ?: "") }
-        val wholePath = remember { mutableStateOf("") }
-        Box(modifier = Modifier.fillMaxSize()) {
+        val targetPath = remember { mutableStateOf(currServer?.targetPath ?: "/dav") }
+        Box(modifier = Modifier.fillMaxSize().background(color = Color.Transparent)) {
             Surface(
                 modifier = Modifier
-                    .size(600.dp, 460.dp)
-                    .align(Alignment.TopCenter)
-                    .background(color = Color.White)
-                    .shadow(
-                        elevation = 5.dp,
-                        RoundedCornerShape(7.dp),
-                        ambientColor = MaterialTheme.colors.surface,
-                        spotColor = MaterialTheme.colors.surface
-                    ),
-                shape = RoundedCornerShape(7.dp)
+                    .size(600.dp, 340.dp)
+                    .align(Alignment.Center),
+                shape = RoundedCornerShape(7.dp),
+                color = MaterialTheme.colors.background
             ) {
                 Column(
                     modifier = Modifier
@@ -84,9 +78,13 @@ fun ModifyServerDialog(modifyServer: ModifyServer, currServer: ServerDesc? = nul
                         .padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "添加服务器", style = MaterialTheme.typography.button)
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = if (currServer == null) "添加" else "修改" + "服务器",
+                        style = MaterialTheme.typography.h4,
+                        color = Color.White
+                    )
 
+                    Spacer(modifier = Modifier.height(10.dp))
                     val (nameF, ipF, portF, userF, passwordF, pathF) = remember {
                         FocusRequester.createRefs()
                     }
@@ -129,10 +127,6 @@ fun ModifyServerDialog(modifyServer: ModifyServer, currServer: ServerDesc? = nul
 
                         )
                     }
-                    Item(
-                        title = "Http Url", value = wholePath, modifier = Modifier.fillMaxWidth()
-                    )
-                    Text(text = "Http Url 不为空时优先识别 Url")
                     Spacer(modifier = Modifier.weight(1f))
                     Row {
                         val (confirm, cancel) = remember {
@@ -161,18 +155,13 @@ fun ModifyServerDialog(modifyServer: ModifyServer, currServer: ServerDesc? = nul
                                     port = port.value.trim(),
                                     user = user.value.trim(),
                                     password = password.value.trim(),
-                                ).apply {
-                                    if (targetPath.value.isNotBlank()) {
-                                        this.targetPath = targetPath.value.trim()
-                                    }
-                                    if (wholePath.value.isNotBlank()) {
-                                        this.wholeUrl = wholePath.value.trim()
-                                    }
-                                }
+                                    targetPath = targetPath.value.trim()
+                                )
                                 if (!server.isValidate()) {
                                     return@focusClick
                                 }
                                 if (currServer != null) {
+
                                 }
                                 modifyServer(server, currServer == null)
                                 dismiss()
@@ -215,12 +204,13 @@ fun MyFocusButton(
     text: String,
     isFocused: Boolean,
     fontSize: TextUnit = TextUnit.Unspecified,
+    defaultColor:Color = Color.Transparent,
     radius: Dp = 27.dp
 ) {
     Box(
         modifier = modifier.background(
-            if (isFocused) MaterialTheme.colors.primary else Color.Transparent,
-            shape = if (isFocused) RoundedCornerShape(radius) else RectangleShape
+            if (isFocused) MaterialTheme.colors.primary else defaultColor,
+            shape = RoundedCornerShape(radius)
         ),
         contentAlignment = Alignment.Center
     ) {

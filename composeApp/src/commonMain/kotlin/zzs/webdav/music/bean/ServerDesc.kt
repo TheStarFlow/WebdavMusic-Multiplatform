@@ -42,17 +42,12 @@ data class ServerDesc(
 
 }
 
-fun isValidHttpUrl(url: String?): Boolean {
-    url ?: return false
-    return  (url.startsWith("http://") || url.startsWith("https://"))
-}
-
 
 fun ServerDesc.isValidate(): Boolean {
-    return isValidHttpUrl(wholeUrl) || !(name.isBlank()
+    return  !(name.isBlank()
             || ip.isEmpty() ||
             port.isEmpty() || user.isEmpty() || password.isEmpty())
 }
 
-fun ServerDesc.generateKey() = if (isValidHttpUrl(wholeUrl)) wholeUrl else "${ip}-${port}"
+fun ServerDesc.generateKey() = "${ip}-${port}"
 

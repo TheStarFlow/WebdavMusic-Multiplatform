@@ -22,7 +22,9 @@ fun main() {
                 size = DpSize(960.dp,540.dp)
             )
         ) {
-            MainScreen()
+            MainScreen(showBack = true){
+                exitApplication()
+            }
         }
     }
 }

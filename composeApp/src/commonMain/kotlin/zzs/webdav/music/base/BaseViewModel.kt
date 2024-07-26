@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import zzs.webdav.music.base.statestore.CoroutinesStateStore
+import java.lang.reflect.ParameterizedType
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.reflect.KProperty1
@@ -54,7 +55,19 @@ abstract class BaseViewModel<S : IState, I : IIntent> : ViewModel() {
     }
 
 
-    abstract fun initUiState(): S
+    open fun initUiState(): S {
+        val genType = javaClass.genericSuperclass
+        return if (genType is ParameterizedType) {
+            val type = genType.actualTypeArguments[0]
+            if (type is Class<*>) {
+                type.newInstance() as S
+            } else {
+                throw IllegalArgumentException("Illegal type")
+            }
+        } else {
+            throw IllegalArgumentException("Illegal type")
+        }
+    }
 
     protected fun setState(reducer: S.() -> S) {
         stateStore.set {
@@ -94,6 +107,11 @@ abstract class BaseViewModel<S : IState, I : IIntent> : ViewModel() {
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ) = suspend { await() }.execute(dispatcher, retainValue, reducer)
+
+
+    fun cancel(){
+        onCleared()
+    }
 
 
     override fun onCleared() {

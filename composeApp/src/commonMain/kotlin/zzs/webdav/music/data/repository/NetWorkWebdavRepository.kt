@@ -7,19 +7,12 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.sardine.DavResource
 import com.github.sardine.Sardine
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
-import org.apache.commons.logging.Log
-import org.koin.core.logger.Level
-import org.koin.core.logger.Logger
-import org.koin.core.logger.PrintLogger
 import zzs.webdav.music.bean.PlayMode
 import zzs.webdav.music.bean.ServerDesc
 import zzs.webdav.music.bean.generateKey
-import zzs.webdav.music.bean.isValidHttpUrl
 import zzs.webdav.music.data.db.ServerDao
 import zzs.webdav.music.utils.LrcUtils
 import zzs.webdav.music.utils.credentials
@@ -45,16 +38,12 @@ class NetWorkWebdavRepository(
     }
 
 
-    override suspend fun fetchDavResList(serverDesc: ServerDesc): List<DavResource> {
+    override suspend fun fetchDavResList(serverDesc: ServerDesc, targetPath: String?): List<DavResource> {
         sardine.setCredentials(serverDesc.user, serverDesc.password)
-        val basicPath =
-            if (isValidHttpUrl(serverDesc.wholeUrl))
-                serverDesc.wholeUrl
-            else
-                "http://${serverDesc.ip}:${serverDesc.port}"
+        val basicPath = "http://${serverDesc.ip}:${serverDesc.port}"
         var path = basicPath
-        if (serverDesc.targetPath?.isNotBlank() == true && !isValidHttpUrl(serverDesc.wholeUrl)) {
-            path = basicPath + serverDesc.targetPath
+        if (!serverDesc.targetPath.isNullOrEmpty()) {
+            path = basicPath +  serverDesc.targetPath// targetPath
         }
         return sardine.list(path).drop(1)
     }

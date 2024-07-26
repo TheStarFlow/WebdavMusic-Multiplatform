@@ -12,6 +12,6 @@ val TextColor = Color.White
 
 
 val themeColors = darkColors().copy(
-    primary = Color(0xffAAB8AB) ,
+    primary = Color(0xffF44336) ,
     background = Color(0xFF53565C)
 )
